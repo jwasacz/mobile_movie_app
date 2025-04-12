@@ -1,3 +1,4 @@
+import { Link } from "expo-router";
 import { Text, View } from "react-native";
 
 
@@ -9,5 +10,3 @@ export default function Index() {
     </View>
   );
 }
-
-//tailwind nie działa. Tailwind not working after isntalation in react native
