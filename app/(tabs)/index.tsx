@@ -25,20 +25,20 @@ export default function Index() {
 
   return (
     <View className="flex-1 bg-primary">
-      <Image source={images.bg} className="w-full absolute z-0" />
+      <Image source={images.bg} className="absolute z-0 w-full" />
 
       <ScrollView
         className="flex-1 px-5"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
       >
-        <Image source={icons.logo} className="w-12 h-10 mt-20 mb-5 mx-auto" />
+        <Image source={icons.logo} className="w-12 h-10 mx-auto mt-20 mb-5" />
 
         {moviesLoading ? (
           <ActivityIndicator
             size="large"
             color="#0000ff"
-            className="mt-10 self-center"
+            className="self-center mt-10"
           />
         ) : moveisError ? (
           <Text>Error: {moveisError?.message}</Text>
@@ -50,8 +50,8 @@ export default function Index() {
             />
 
             <>
-              <Text className="text-lg text-white font-bold mt-5 mb-3">
-                Latest movies{" "}
+              <Text className="mt-5 mb-3 text-lg font-bold text-white">
+                Popularne w tym miesiącu{" "}
               </Text>
 
               <FlatList
@@ -65,7 +65,7 @@ export default function Index() {
                   paddingRight: 5,
                   marginBottom: 10,
                 }}
-                className="mt-2 pb-32"
+                className="pb-32 mt-2"
                 scrollEnabled={false}
               />
             </>
