@@ -95,7 +95,19 @@ const _layout = () => {
           ),
         }}
       />
+
+      <Tabs.Screen
+        name="about"
+        options={{
+          title: "About",
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <TabIcon focused={focused} icon={icons.black_star} title="About" />
+          ),
+        }}
+      />
     </Tabs>
+    
   );
 };
 
