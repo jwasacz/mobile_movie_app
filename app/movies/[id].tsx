@@ -1,10 +1,11 @@
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native'
-import React from 'react'
-import { router, useLocalSearchParams } from 'expo-router'
+import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useCallback } from 'react';
+import { router, useLocalSearchParams } from 'expo-router';
 import useFetch from '@/services/useFetch';
 import { fetchMoviesDetails } from '@/services/api';
 import { Image } from 'react-native';
 import { icons } from '@/constants/icons';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
 interface MovieInfoProps {
   label: string;
@@ -13,70 +14,104 @@ interface MovieInfoProps {
 
 const MovieInfo = ({ label, value }: MovieInfoProps) => (
   <View className="flex-col items-start justify-center mt-5">
-      <Text className="text-light-200 font-normal text-sm">
-        {label}
-      </Text>
-      <Text className="text-light-200 font-normal text-sm">
-          {value || 'N/A'}
-      </Text>
+    <Text className="text-light-200 font-normal text-sm">
+      {label}
+    </Text>
+    <Text className="text-light-200 font-normal text-sm">
+      {value || 'N/A'}
+    </Text>
   </View>
-)
+);
+
+// Funkcja dodająca film do ulubionych
+const addToFavorites = async (movie: any) => {
+  try {
+    // Odczytujemy zapisane filmy z AsyncStorage
+    const savedMovies = JSON.parse(await AsyncStorage.getItem('savedMovies') || '[]');
+    
+    // Dodajemy nowy film do listy
+    savedMovies.push(movie);
+    
+    // Zapisujemy zaktualizowaną listę filmów do AsyncStorage
+    await AsyncStorage.setItem('savedMovies', JSON.stringify(savedMovies));
+  } catch (error) {
+    console.error('Błąd zapisywania filmu do ulubionych', error);
+  }
+};
 
 const MovieDetails = () => {
-  const {id} = useLocalSearchParams();
-
+  const { id } = useLocalSearchParams();
   const { data: movie, loading } = useFetch(() => fetchMoviesDetails(id as string));
+
   return (
-    <View className= "bg-primary flex -1">
-      <ScrollView contentContainerStyle= {{ paddingBottom : 80}}>
-        <View>  
-          <Image source= {{ uri: `https://image.tmdb.org/t/p/w500${movie?.poster_path}`}} className="w-full h-[550px]" resizeMode= "stretch"/>
+    <View className="bg-primary flex-1">
+      <ScrollView contentContainerStyle={{ paddingBottom: 80 }}>
+        <View>
+          <Image
+            source={{ uri: `https://image.tmdb.org/t/p/w500${movie?.poster_path}` }}
+            className="w-full h-[550px]"
+            resizeMode="stretch"
+          />
         </View>
 
         <View className="flex-col items-start justify-center mt-5 px-5">
-            <Text className="text-white font-bold text-xl">{movie?.title}</Text>
-              <View className="flex-row items-center gap-x-1 mt-2">
-                <Text className="text-light-200 text-sm">{movie?.release_date?.split('-')[0]}</Text>
-                <Text className="text-light-200 text-sm">{movie?.runtime}m</Text>
-              </View>
+          <Text className="text-white font-bold text-xl">{movie?.title}</Text>
+          <View className="flex-row items-center gap-x-1 mt-2">
+            <Text className="text-light-200 text-sm">{movie?.release_date?.split('-')[0]}</Text>
+            <Text className="text-light-200 text-sm">{movie?.runtime}m</Text>
+          </View>
 
-              <View className="flex-row items-center bg-dark-100 px-2 py-1 rounded-md gap-x-1 mt-2">
-                <Image source={icons.star} className="size-4"></Image>
-                  <Text className="text-white font-bold text-sm">{Math.round(movie?.vote_average ?? 0)}/10</Text>
-                  <Text className="text-light-200 text-sm">({movie?.vote_count} votes)</Text>
-              </View>
+          <View className="flex-row items-center bg-dark-100 px-2 py-1 rounded-md gap-x-1 mt-2">
+            <Image source={icons.star} className="size-4" />
+            <Text className="text-white font-bold text-sm">
+              {Math.round(movie?.vote_average ?? 0)}/10
+            </Text>
+            <Text className="text-light-200 text-sm">({movie?.vote_count} votes)</Text>
+          </View>
 
-              <MovieInfo label="Overview" value={movie?.overview} />
-              <MovieInfo label="Genres" value={movie?.genres ?.map((g) => g.name).join(' - ') || 'N/A'} />
-                <View className="felx flex-row justify-between w-1/2">
-                <MovieInfo 
-    label="Budget" 
-    value={
-      movie?.budget !== undefined
-        ? `$${Math.round(movie.budget / 1_000_000)} million`
-        : 'N/A'
-    }
-  />
-  <MovieInfo 
-    label="Revenue" 
-    value={
-      movie?.revenue !== undefined
-        ? `$${Math.round(movie.revenue / 1_000_000)} million`
-        : 'N/A'
-    }
-  />
-                </View>
+          <MovieInfo label="Overview" value={movie?.overview} />
+          <MovieInfo label="Genres" value={movie?.genres?.map((g) => g.name).join(' - ') || 'N/A'} />
 
-                <MovieInfo label="Production Companies" value={movie?.production_companies.map((c) => c.name).join(' - ') || 'N/A'}/>
+          <View className="flex flex-row justify-between w-1/2">
+            <MovieInfo
+              label="Budget"
+              value={
+                movie?.budget !== undefined
+                  ? `$${Math.round(movie.budget / 1_000_000)} million`
+                  : 'N/A'
+              }
+            />
+            <MovieInfo
+              label="Revenue"
+              value={
+                movie?.revenue !== undefined
+                  ? `$${Math.round(movie.revenue / 1_000_000)} million`
+                  : 'N/A'
+              }
+            />
+          </View>
+
+          <MovieInfo label="Production Companies" value={movie?.production_companies.map((c) => c.name).join(' - ') || 'N/A'} />
+
+          {/* Dodaj przycisk do zapisania filmu do ulubionych */}
+          <TouchableOpacity
+            onPress={() => addToFavorites(movie)}
+            className="mt-5 bg-accent rounded-lg py-3.5 flex flex-row items-center justify-center"
+          >
+            <Text className="text-white font-semibold text-base">Add to Favorites</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
-      
-      <TouchableOpacity className="absolute bottom-5 left-0 right-0 mx-5 bg-accent rounded-lg py-3.5 flex flex-row items-center justify-center z-50" onPress={router.back}>
-        <Image source={icons.arrow} className="size -5 mr-1 mt-0.5 rotate-180" tintColor="#fff"/>
-          <Text className="text-white font-semibold text-base">Go back</Text>
+
+      <TouchableOpacity
+        className="absolute bottom-5 left-0 right-0 mx-5 bg-accent rounded-lg py-3.5 flex flex-row items-center justify-center z-50"
+        onPress={router.back}
+      >
+        <Image source={icons.arrow} className="size-5 mr-1 mt-0.5 rotate-180" tintColor="#fff" />
+        <Text className="text-white font-semibold text-base">Go back</Text>
       </TouchableOpacity>
     </View>
-  )
-}
+  );
+};
 
-export default MovieDetails
+export default MovieDetails;

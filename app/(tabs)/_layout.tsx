@@ -97,12 +97,12 @@ const _layout = () => {
       />
 
       <Tabs.Screen
-        name="about"
+        name="O projekcie,"
         options={{
-          title: "About",
+          title: "O projekcie",
           headerShown: false,
           tabBarIcon: ({ focused }) => (
-            <TabIcon focused={focused} icon={icons.black_star} title="About" />
+            <TabIcon focused={focused} icon={icons.black_star} title="O projekcie" />
           ),
         }}
       />
