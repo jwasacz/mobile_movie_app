@@ -9,25 +9,22 @@ const About = () => {
       <ScrollView className="px-5">
 
         <View className="items-center mt-10">
-          {/* Ikona projektu */}
+          
           <Image
-            source={icons.logo} // lub icons.star jeśli wolisz gwiazdkę
+            source={icons.logo} 
             className="w-20 h-20"
             resizeMode="contain"
           />
           
-          {/* Nazwa projektu */}
           <Text className="text-white text-2xl font-bold mt-6">
             Mobile Movie - App
           </Text>
 
-          {/* Krótkie hasło */}
           <Text className="text-light-200 text-sm mt-2 text-center">
             Twoje źródło najnowszych filmów.
           </Text>
         </View>
 
-        {/* Sekcja opisu */}
         <View className="mt-10">
           <Text className="text-white text-lg font-bold mb-4">
             O aplikacji
@@ -41,7 +38,6 @@ const About = () => {
           </View>
         </View>
 
-        {/* Sekcja funkcji */}
         <View className="mt-10">
           <Text className="text-white text-lg font-bold mb-4">
             Jakie funkcjonalności zostały zawarte w projekcie?
@@ -54,7 +50,6 @@ const About = () => {
           </View>
         </View>
 
-        {/* Podpis */}
         <View className="items-center mt-16 mb-10">
             <Text className="text-light-100 text-xs">
             © 2025

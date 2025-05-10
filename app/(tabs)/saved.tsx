@@ -5,16 +5,20 @@ import {
   FlatList,
   TouchableOpacity,
   Alert,
+  Image,
+  ScrollView,
 } from "react-native";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useFocusEffect } from "@react-navigation/native"; // ← tutaj
+import { useFocusEffect } from "@react-navigation/native";
+import MovieCard from "@/components/MovieCard";
+import { images } from "@/constants/images";
+import { icons } from "@/constants/icons";
 
 const Saved = () => {
   const [savedMovies, setSavedMovies] = useState<any[]>([]);
   const router = useRouter();
 
-  // 🔁 Ładowanie danych przy wejściu na ekran
   useFocusEffect(
     useCallback(() => {
       const loadSavedMovies = async () => {
@@ -41,78 +45,67 @@ const Saved = () => {
     }
   };
 
-  const renderMovieCard = ({ item }: { item: any }) => (
-    <TouchableOpacity
-      onPress={() => router.push(`../movies/${item.id.toString()}`)}
-      style={{
-        backgroundColor: "#1F1F1F",
-        padding: 16,
-        marginVertical: 8,
-        marginHorizontal: 16,
-        borderRadius: 12,
-        shadowColor: "#000",
-        shadowOpacity: 0.1,
-        shadowRadius: 6,
-        shadowOffset: { width: 0, height: 3 },
-      }}
-    >
-      <Text style={{ color: "#fff", fontSize: 16, fontWeight: "600" }}>
-        {item.title}
-      </Text>
-      <Text style={{ color: "#aaa", marginTop: 4 }}>ID: {item.id}</Text>
-    </TouchableOpacity>
-  );
-
   return (
-    <View style={{ flex: 1, backgroundColor: "#0F0D23", paddingTop: 20 }}>
-      <Text
-        style={{
-          color: "#fff",
-          fontSize: 24,
-          fontWeight: "bold",
-          textAlign: "center",
-          marginBottom: 12,
-        }}
-      >
-        Saved Movies
-      </Text>
+    <View className="flex-1 bg-primary">
+      <Image source={images.bg} className="absolute z-0 w-full" />
 
-      {savedMovies.length > 0 ? (
-        <>
-          <TouchableOpacity
-            onPress={clearSavedMovies}
+      <ScrollView
+        className="flex-1 px-5"
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ minHeight: "100%", paddingBottom: 10 }}
+      >
+        <Image source={icons.logo} className="w-12 h-10 mx-auto mt-20 mb-5" />
+
+        <Text className="text-white text-2xl font-bold text-center mb-4">
+          Saved Movies
+        </Text>
+
+        {savedMovies.length > 0 ? (
+          <>
+            <TouchableOpacity
+              onPress={clearSavedMovies}
+              style={{
+                backgroundColor: "#FF4C4C",
+                padding: 12,
+                marginHorizontal: 16,
+                borderRadius: 10,
+                marginBottom: 8,
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: "#fff", fontWeight: "bold" }}>
+                Usuń wszystkie filmy
+              </Text>
+            </TouchableOpacity>
+
+            <FlatList
+              data={savedMovies}
+              renderItem={({ item }) => <MovieCard {...item} />}
+              keyExtractor={(item) => item.id.toString()}
+              numColumns={3}
+              columnWrapperStyle={{
+                justifyContent: "flex-start",
+                gap: 20,
+                paddingRight: 5,
+                marginBottom: 10,
+              }}
+              className="pb-32 mt-2"
+              scrollEnabled={false}
+            />
+          </>
+        ) : (
+          <Text
             style={{
-              backgroundColor: "#FF4C4C",
-              padding: 12,
-              marginHorizontal: 16,
-              borderRadius: 10,
-              marginBottom: 8,
-              alignItems: "center",
+              textAlign: "center",
+              color: "#aaa",
+              marginTop: 20,
+              fontSize: 16,
             }}
           >
-            <Text style={{ color: "#fff", fontWeight: "bold" }}>
-              Usuń wszystkie filmy
-            </Text>
-          </TouchableOpacity>
-
-          <FlatList
-            data={savedMovies}
-            renderItem={renderMovieCard}
-            keyExtractor={(item) => `${item.id}-${item.title}`}
-          />
-        </>
-      ) : (
-        <Text
-          style={{
-            textAlign: "center",
-            color: "#aaa",
-            marginTop: 20,
-            fontSize: 16,
-          }}
-        >
-          Brak zapisanych filmów.
-        </Text>
-      )}
+            Brak zapisanych filmów.
+          </Text>
+        )}
+      </ScrollView>
     </View>
   );
 };
